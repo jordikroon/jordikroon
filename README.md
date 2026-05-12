@@ -9,9 +9,9 @@ lot about making technical docs that don't suck.
 
 ### What I'm doing now
 
-- 📖 Maintaining [`php/doc-en`](https://github.com/php/doc-en) — reviewing PRs,
+- 📖 Maintaining [`php/doc-en`](https://github.com/php/doc-en) - reviewing PRs,
   modernising examples, writing new manual pages.
-- 🛠️ Building [`docbook-cs`](https://github.com/jordikroon/docbook-cs) — lint
+- 🛠️ Building [`docbook-cs`](https://github.com/jordikroon/docbook-cs) - lint
   tooling that keeps DocBook contributions consistent at scale.
 - ☸️ Running PHP / Craft / Sveltekit workloads on Kubernetes with
   ArgoCD + Terraform.
@@ -28,7 +28,7 @@ lot about making technical docs that don't suck.
 <details>
 <summary>About this repo</summary>
 
-This is the source for [jordikroon.nl](https://jordikroon.nl) — an Astro static
+This is the source for [jordikroon.nl](https://jordikroon.nl) - an Astro static
 site deployed to GitHub Pages. Build, content authoring and deployment notes
 live in [`DEVELOPMENT.md`](./DEVELOPMENT.md).
 
