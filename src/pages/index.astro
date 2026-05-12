@@ -1,0 +1,122 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import PostCard from '@/components/PostCard.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import { SOCIAL } from '@/site.config';
+import { NOW } from '@/data/now';
+import Email from '@/components/Email.astro';
+
+const STATUS_ORDER: Record<string, number> = {
+  active: 0,
+  maintained: 1,
+  reference: 2,
+  archived: 3,
+};
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+  .slice(0, 4);
+
+const projects = (await getCollection('projects'))
+  .filter((p) => p.data.featured)
+  .sort((a, b) => {
+    const statusDiff =
+      (STATUS_ORDER[a.data.status] ?? 99) - (STATUS_ORDER[b.data.status] ?? 99);
+    if (statusDiff !== 0) return statusDiff;
+    return a.data.order - b.data.order;
+  });
+---
+
+<Base>
+  <section class="relative overflow-hidden">
+    <div class="grid-paper pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
+
+    <div class="container-wide pt-24 pb-20 sm:pt-32">
+      <p class="eyebrow">
+        <span class="text-[var(--color-positive)]">●</span>
+        Eindhoven, NL
+      </p>
+
+      <h1 class="display mt-6 text-[clamp(2.25rem,6.5vw,4.25rem)]">
+        DevOps &amp; back-end engineer.
+        <br />
+        <em>Maintainer</em> of the
+        <a class="link-underline decoration-[var(--color-accent)]" href={SOCIAL.phpDocs} rel="noopener">
+          PHP documentation</a>.
+      </h1>
+
+      <p class="mt-8 max-w-[58ch] text-[1.1rem] text-[var(--color-muted)] text-balance">
+        I host the sites and campaigns for
+        <a class="link-underline" href={SOCIAL.onyourmarks} rel="noopener">On Your Marks</a>
+        clients. On Kubernetes. Through
+        <a class="link-underline" href="https://argo-cd.readthedocs.io/" rel="noopener">ArgoCD</a>.
+      </p>
+
+      <ul class="mt-10 flex flex-wrap gap-x-5 gap-y-2 font-mono text-sm">
+        <li><a class="link-underline" href={SOCIAL.github} rel="me noopener">→ github</a></li>
+        <li><a class="link-underline" href={SOCIAL.linkedin} rel="me noopener">→ linkedin</a></li>
+        <li><a class="link-underline" href="/now">→ now</a></li>
+        <li><Email class="link-underline" label="→ email" /></li>
+        <li><a class="link-underline" href="/pgp">→ pgp</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="container-wide -mt-4 mb-20">
+    <div class="grid gap-x-6 gap-y-3 border-y border-[var(--color-line)] py-5 sm:grid-cols-[max-content_1fr] sm:gap-x-10">
+      <p class="eyebrow">§00 now</p>
+      <dl class="grid grid-cols-1 gap-x-8 gap-y-2 font-mono text-sm sm:grid-cols-[max-content_1fr]">
+        {
+          NOW.items.map((item) => (
+            <>
+              <dt class="text-[var(--color-subtle)]">{item.label}</dt>
+              <dd class:list={[item.muted && 'text-[var(--color-muted)]']}>
+                {item.href ? (
+                  <a class="link-underline" href={item.href} rel="noopener">
+                    {item.text}
+                  </a>
+                ) : (
+                  item.text
+                )}
+              </dd>
+            </>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  {
+    projects.length > 0 && (
+      <section class="container-wide mt-20">
+        <SectionHeading
+          number="01"
+          title="Selected work"
+          href="/projects"
+          hrefLabel="all projects"
+        />
+        <div>
+          {projects.map((project) => <ProjectCard project={project} />)}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    posts.length > 0 && (
+      <section class="container-wide mt-20">
+        <SectionHeading
+          number="02"
+          title="Recent writing"
+          href="/blog"
+          hrefLabel="all posts"
+        />
+        <div>
+          {posts.map((post) => <PostCard post={post} />)}
+        </div>
+      </section>
+    )
+  }
+</Base>

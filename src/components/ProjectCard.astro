@@ -1,0 +1,60 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { name, description, url, repo, role, status, tags } = project.data;
+const primaryHref = url ?? repo;
+
+const statusLabel = {
+  active: 'active',
+  maintained: 'maintained',
+  archived: 'archived',
+  reference: 'reference',
+}[status];
+---
+
+<article
+  class="group relative grid grid-cols-[max-content_1fr] items-baseline gap-x-6 gap-y-1 border-b border-[var(--color-line)] py-5 sm:gap-x-10"
+>
+  <div class="flex pt-1 font-mono text-[0.7rem]">
+    <span class="annotation" data-status={status}>[{statusLabel}]</span>
+  </div>
+  <div>
+    <header class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+      <h3 class="text-lg font-medium leading-snug">
+        {
+          primaryHref ? (
+            <a
+              href={primaryHref}
+              rel="noopener"
+              class="transition-colors group-hover:text-[var(--color-accent)]"
+            >
+              {name}
+            </a>
+          ) : (
+            name
+          )
+        }
+      </h3>
+      {role && <p class="font-mono text-xs text-[var(--color-muted)]">{role}</p>}
+    </header>
+    <p class="mt-1 text-sm text-[var(--color-muted)] text-balance">{description}</p>
+    <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs">
+      {repo && <a class="link-underline" href={repo} rel="noopener">source</a>}
+      {url && url !== repo && <a class="link-underline" href={url} rel="noopener">visit</a>}
+      {
+        tags.length > 0 && (
+          <ul class="flex flex-wrap gap-1.5 text-[var(--color-subtle)]">
+            {tags.map((tag) => (
+              <li>#{tag}</li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </div>
+</article>

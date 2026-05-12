@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+
+const STATUS_ORDER: Record<string, number> = {
+  active: 0,
+  maintained: 1,
+  reference: 2,
+  archived: 3,
+};
+
+const projects = (await getCollection('projects')).sort((a, b) => {
+  const statusDiff =
+    (STATUS_ORDER[a.data.status] ?? 99) - (STATUS_ORDER[b.data.status] ?? 99);
+  if (statusDiff !== 0) return statusDiff;
+  if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+  if (a.data.order !== b.data.order) return a.data.order - b.data.order;
+  return a.data.name.localeCompare(b.data.name);
+});
+---
+
+<Base
+  title="Projects"
+  description="Open source projects and notable work by Jordi Kroon."
+>
+  <section class="container-wide pt-20">
+    <p class="eyebrow">Projects</p>
+    <h1 class="display mt-4 text-[clamp(2rem,5vw,3.25rem)]">
+      Things worth <em>pointing at</em>.
+    </h1>
+    <p class="mt-5 max-w-2xl text-[var(--color-muted)] text-balance">
+      Open source projects, contributions and tools. Active work first, archived bits at the bottom.
+      For everything else, see
+      <a class="link-underline" href="https://github.com/jordikroon" rel="noopener">my GitHub</a>.
+    </p>
+  </section>
+
+  <section class="container-wide mt-12">
+    {projects.map((project) => <ProjectCard project={project} />)}
+  </section>
+</Base>

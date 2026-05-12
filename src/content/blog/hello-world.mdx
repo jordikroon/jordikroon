@@ -1,0 +1,52 @@
+---
+title: 'Hello, world. A canonical home for the writing.'
+description: "Why I built a personal site, what runs it, and why my writing lives here now instead of on Medium or anywhere else."
+pubDate: 2026-05-13
+tags: ['meta', 'open-source']
+---
+
+I have been writing PHP, shipping infrastructure, and quietly contributing to open
+source for long enough that having no personal home on the web started to feel
+strange. So here we are.
+
+If [the PHP manual should be the source of truth](/blog/maintaining-php-docs), the
+same instinct applies to my own writing. My domain. My canonical URLs. No paywall,
+no algorithm, no platform deciding which of my old posts gets boosted this month.
+
+## What this place is
+
+Three things, in roughly this order:
+
+1. A pointer to my **work**:
+   [On Your Marks](https://www.onyourmarks.agency/over/), the
+   [PHP documentation](https://github.com/php/doc-en), the
+   [Kubernetes hosting I run](/work) for client sites, and the open source projects
+   I publish.
+2. A spot to **write**, tagged and RSS'd, built to outlast platform churn. The
+   first long piece is a 2019
+   [walk-through of the RacingNews365 caching rebuild](/blog/racingnews365-engine-upgrade)
+   that I pulled back from Medium as its canonical version.
+3. A **PGP** anchor. If you want to send me something private or verify a
+   signature, the key lives at [/pgp](/pgp).
+
+## What runs it
+
+Open source all the way down. The stack:
+
+- [Astro](https://astro.build) 6 with MDX content collections. Type-safe blog and
+  project metadata via Zod schemas (`astro:schema`).
+- [Tailwind CSS](https://tailwindcss.com) v4.3, CSS-first configuration.
+- [Shiki](https://shiki.style) for syntax highlighting, with `vitesse-light` and
+  `vitesse-dark` themes that match the rest of the page.
+- [Fraunces](https://fonts.google.com/specimen/Fraunces) for display type,
+  [JetBrains Mono](https://www.jetbrains.com/mono/) for code,
+  [Inter](https://rsms.me/inter/) for body. All variable, all OFL-licensed.
+- GitHub Actions deploying to GitHub Pages on Node 24 with pnpm 10.
+
+Total JavaScript shipped on most pages: a single theme toggle. That is the point.
+
+## What's next
+
+More posts. Probably caching, probably Kubernetes, probably PHP. The
+[/now](/now) page has the short version of what I'm currently focused on.
+Subscribe via [RSS](/rss.xml) if that is your thing.

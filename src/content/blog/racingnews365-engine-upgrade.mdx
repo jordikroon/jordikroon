@@ -1,0 +1,237 @@
+---
+title: 'How we upgraded the engine behind RacingNews365'
+description: 'In 2019 we rebuilt the caching layer behind a 17M-visitor Formula 1 site. Varnish ESI, surrogate keys, randomised cache-control, central cache-config. Notes from the rebuild.'
+pubDate: 2019-05-16
+tags: ['php', 'craft-cms', 'caching', 'varnish', 'performance']
+---
+
+→ [racingnews365.nl](https://racingnews365.nl)
+
+Formula 1 in The Netherlands is a big thing. With Max Verstappen as rising star, the
+attention for the sport has grown tremendously. These numbers return in overall TV
+statistics and F1 related websites. RacingNews365 is one of the websites that jumped
+on the Max Verstappen hype. With 2.7 million visitors in 2016 (when Verstappen was
+driving for Toro Rosso) the website had a successful start. When Verstappen made his
+transfer to the Red Bull Racing Team numbers exploded from 7.6 million visitors in
+2017 to almost 17 million visitors in 2018. These numbers, with peak traffic during
+races, require a good setup and a stable foundation.
+
+![](/posts/racingnews365-engine/hero.png)
+
+In 2018, we managed to get control over the regular traffic, but we still had a couple
+of bad moments during and immediately after a race peak. We were able to fix most
+issues, but some were laying deep in the code and the CMS behind it. These issues
+became a problem with visitor numbers increasing to a certain point. In the meantime
+Craft CMS was being updated to Craft 3 which implemented the new Yii2 Framework. These
+updates promised to improve performance and some issues we were facing. This made us
+decide to start over from scratch.
+
+Our experiences with the previous website gave us enough learnings of what we should
+do and what we should not do. Loading a heavy PHP framework on every request with
+these amount of pageviews will make our server-load explode within seconds. That's
+why we need to add caching and to cache the cache. Our caching server should do the
+work, not the server running the application. We were also very aware of the fact
+that caching adds complexity and odd side effects. When a page is flushed from the
+cache it will enter a grace state for a short period of time. During this period, all
+users will access the application server. We spent hours debugging our code because
+we noticed a 30 seconds downtime every 5 hours. This happened because all of our
+pages were cached for 5 hours. The solution was simple though: randomize the cache
+control values. With these notes in mind we went on and decided that:
+
+- Users should never directly query a database
+- XHR calls should not load the full framework
+- All pages should be cached (except XHR calls)
+- Cache should be really easy to manage and extend
+- Full cache flush should never happen
+
+## Server & code optimization
+
+A good foundation is only possible when the developer and server engineer work
+together. It opens up possibilities that would normally not be possible. A developer
+might say that the server should be upscaled and the server engineer might say that
+the code performance should be improved. While in fact they should think about ways
+to optimize both.
+
+### Server optimizations
+
+- Enable OPCache
+- Use PHP-FPM
+- Use Apache MPM event
+- Varnish full page caching on a separate server
+- Configure idle workers
+
+### Code optimizations
+
+- Cache with Redis
+- Use the correct cache headers
+- Prefer XHR over regular POST calls
+- Avoid the use of (heavy) database queries
+- Use Edge Side Includes
+
+If you need to do heavy tasks, consider moving these to a cronjob. MySQL has a
+certain amount of threads. If threads are full because of locked queries, the website
+will have to wait for a thread to open up. This will cause many issues and there's
+no fun in digging into why and when this is happening.
+
+## Caching
+
+We decided to change our caching structure. When an article went live in the previous
+setup, we would flush the article and trace back the URLs to the news overview, the
+homepage and all the other pages of the website where this article would be shown.
+While this seemed a reasonable way of working at that time, the constantly increasing
+amount of related pages and categories made it to become messy. It just did not feel
+right and clean anymore. Therefore we introduced surrogate keys as a replacement. We
+would now label all our website elements as `homepage`, `content-overview`,
+`article`, `entry-id-[%id%]`, `race-calendar` and so on. Instead of flushing a single
+article and tracing back all the other pages, we would now only have to flush a
+specific set of tags.
+
+### Edge Side Includes
+
+Caching full pages was not enough for us. Our goal was to never ever do a full cache
+flush at all. Never. When all pages are fully cached and you edit a menu item, you
+would normally need to flush all pages. The solution for this problem is ESI (Edge
+Side Includes). ESI is an HTML/XML-style syntax that looks a bit like HTML, but
+different.
+
+```html
+<div class="header">
+    <esi:include
+       src="http://example.com/esi/menu/main-menu.html"
+       onerror="continue"/>
+</div>
+```
+
+ESI is designed to work perfectly together with Varnish. It reads your HTML output
+and when it detects an ESI tag, it replaces the ESI tag with the output of the
+`src`. Now when you update the menu, you do not have to clear the full page
+anymore, but just simply flush the source where the ESI tag is pointing to.
+
+### Content Delivery Network
+
+Previously, all of our assets were served by our cache server with a lifetime of 2
+months. At first sight this sounds as a good alternative for the cost of a CDN
+(Content Delivery Network). However, the cache server keeps these assets in memory
+for 2 months and would cause odd effects like random cache flushes for regular pages
+because the cache server is burning old cache entries for newer entries. Since we
+are already using Amazon Web Services, it's an easy pick to go for S3 with CloudFront
+as our CDN. By moving assets to S3 and using the CDN we noticed that the costs for
+using the CDN were almost fully covered by EC2 as most bandwidth is caused by users
+downloading assets.
+
+### Pre-rendering dynamic content
+
+Dynamic content is not changed as often as you might think. In our case, it's only
+changed when content is added from the CMS. Why render a menu on every request when
+resources are limited? Rendering the menu to a static HTML-file after changing it is
+a simple yet effective improvement. Our ESI-tag would then point to this static
+HTML-file instead of a location parsed by Craft, skipping Twig and all the other
+overhead.
+
+### Cache control
+
+The cache server only caches pages that contain the HTTP Cache-Control header. With
+ESI content you usually set these headers for every file, but that's causing a lot of
+mess in the code and thus not an ideal solution. Craft uses the Twig template engine.
+Within Twig we can write functions with custom logic.
+
+```twig
+{{ includeEsiBlock('@siteCacheFolder/esi/sidebar/special.html', {
+    cache_tags: ['content-overview', 'special'],
+    cache_seconds: (86400*30)|numberWithRange(86400)
+}) }}
+```
+
+This function will convert the path into an URL. Note the `numbersWithRange`, it
+randomizes the `cache_seconds` to ensure that the cache will not expire together
+with other objects at the exact same time.
+
+```html
+<esi:include
+    src="/cache/site/RN365NL/esi/sidebar/special.html?cache_control=1&cache_seconds=2611010&cache_tag%5B0%5D=content-overview&cache_tag%5B1%5D=special"
+    onerror="continue"/>
+```
+
+In our `.htaccess` file, we match all URLs that contain `cache_control`. We then
+convert the `cache_seconds` into a HTTP header. We tried doing the same with the
+`cache_tag`, but we cannot seem to do much manipulation on the URL values like URL
+decoding and concatenation. Thus we have to re-route all URLs to a
+`static-file-loader.php` file. This file is lightweight and only converts the
+`cache_tag[]=tag1&cache_tag[]=tag2` into a HTTP header `xkey=tag1 tag2`. Varnish
+reads these HTTP-headers to determine how the ESI-content should be rendered and if
+a new version should be fetched from the application server.
+
+```apache
+RewriteCond %{QUERY_STRING} (^|&)cache_control=1(&|$)
+RewriteRule .* static-file-loader.php
+
+RewriteCond %{QUERY_STRING} (^|&)cache_control=1(&|$)
+RewriteCond %{QUERY_STRING} (^|&)cache_seconds=([^\s&]+)(&|$)
+RewriteRule .* - [E=CACHESECONDS:%2]
+
+Header set "Cache-Control" "max-age=1, s-maxage=%{CACHESECONDS}e" env=CACHESECONDS
+```
+
+### Cache management
+
+With all these layers of cache we were aiming for a way to manage cache on a
+centralized place. That's where we added a simple `cache-config` file to our project.
+To give you a better understanding, Craft has "globals" and "sections". Both having
+an upper abstraction layer called "Elements". Globals can be seen as data objects
+that you can add to any place in your website. Like a head navigation, footer items.
+Or just a simple text block. A section can be split up in "Singles" (homepage,
+overview pages) and "Channels" (detail pages like news items). Each type now having
+its own key in our `cache-config`.
+
+Craft dispatches events on given moments. What we are mostly interested in is the
+event that is triggered right after an element is added, updated or removed. At that
+moment we run our so-called `flushBehaviour` starting from top to bottom. Each
+callable within this array is executed with a set of parameters.
+
+When a news-item is updated, we first rewrite a bunch of twig templates. Then we
+flush the content-overview and special pages from the cache using surrogate labels,
+but only when certain fields have changed. And finally we flush the current entry,
+dossier and error pages.
+
+When a new tag is added for a new or existing Craft global or section, we only have
+to add it to this config-file. And developers only have a one central file to look
+into to understand how the cache behaves and what effects adding, updating or
+removing an element in Craft.
+
+```php
+/*
+ * Section/Entry config
+ */
+'entries' => [
+    'contentItem' => [
+        'flushBehaviour' => [
+            [
+                'callable' => [CacheService::class, 'handleFlushByTags'],
+                'parameters' => [
+                    'tags' => ['content-overview', 'event', 'special'],
+                ],
+            ],
+            [
+                'callable' => [CacheService::class, 'handleFlushByTags'],
+                'parameters' => [
+                    'tags' => ['entry-id-[%ID%]', 'dossier', 'error'],
+                ],
+            ],
+        ],
+    ],
+],
+```
+
+## Conclusion
+
+The announcement of the new major CMS version made us rethink the entire structure
+of the RacingNews365 website. Of course, we all hope to see a lot more prestige
+actions from Max Verstappen this season and expect the amount of pageviews to grow
+even more. By rebuilding the caching structure from scratch and implementing some
+core changes, we have tackled major bottlenecks which would otherwise cause us
+headaches in the future. The average response time decreased from 2.5 seconds to as
+little as 0.3 seconds and the system load has not showed spikes during race peaks.
+Our focus did shift from monitoring server metrics to watching Max Verstappen do
+overtakes in F1 races. These low metrics also opens up new possibilities for
+innovations and new features to keep RacingNews365 the leading Formula 1 website in
+The Netherlands.

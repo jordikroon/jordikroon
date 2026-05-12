@@ -1,0 +1,53 @@
+---
+import Base from '@/layouts/Base.astro';
+import FormattedDate from '@/components/FormattedDate.astro';
+import { NOW } from '@/data/now';
+
+const updated = new Date(NOW.updated);
+---
+
+<Base
+  title="Now"
+  description="What Jordi Kroon is focused on right now."
+>
+  <section class="container-prose pt-20">
+    <p class="eyebrow">§ now</p>
+    <h1 class="display mt-4 text-[clamp(2rem,5vw,3.25rem)]">
+      <em>Now</em>
+    </h1>
+    <p class="mt-4 font-mono text-xs text-[var(--color-muted)]">
+      Last updated <FormattedDate date={updated} />.
+      Inspired by <a class="link-underline" href="https://nownownow.com/about" rel="noopener">nownownow.com</a>.
+    </p>
+
+    <dl class="mt-12 grid grid-cols-[max-content_1fr] gap-x-8 gap-y-4 font-mono text-sm">
+      {
+        NOW.items.map((item) => (
+          <>
+            <dt class="pt-1 text-xs uppercase tracking-wider text-[var(--color-subtle)]">
+              {item.label}
+            </dt>
+            <dd class:list={['text-base', item.muted && 'text-[var(--color-muted)]']}>
+              {item.href ? (
+                <a class="link-underline" href={item.href} rel="noopener">
+                  {item.text}
+                </a>
+              ) : (
+                item.text
+              )}
+            </dd>
+          </>
+        ))
+      }
+    </dl>
+
+    <div class="mt-16 border-t border-[var(--color-line)] pt-8 text-sm text-[var(--color-muted)]">
+      <p>
+        This page is the source of truth for "what is Jordi up to?". I update it when
+        the answer changes. For the longer version, see
+        <a class="link-underline" href="/work">work</a> and
+        <a class="link-underline" href="/projects">projects</a>.
+      </p>
+    </div>
+  </section>
+</Base>

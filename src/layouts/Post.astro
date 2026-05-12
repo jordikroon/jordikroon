@@ -1,0 +1,57 @@
+---
+import Base from './Base.astro';
+import FormattedDate from '@/components/FormattedDate.astro';
+import TagList from '@/components/TagList.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  tags?: string[];
+  readingTime?: number;
+}
+
+const { title, description, pubDate, updatedDate, tags = [], readingTime } = Astro.props;
+---
+
+<Base
+  title={title}
+  description={description}
+  pageType="article"
+  pubDate={pubDate}
+  updatedDate={updatedDate}
+  tags={tags}
+>
+  <article class="container-prose pt-12 sm:pt-20">
+    <header class="mb-10 border-b border-[var(--color-line)] pb-8">
+      <div
+        class="mb-3 flex items-center gap-3 font-mono text-xs text-[var(--color-muted)] uppercase tracking-wider"
+      >
+        <FormattedDate date={pubDate} />
+        {readingTime && <><span aria-hidden="true">·</span><span>{readingTime} min read</span></>}
+        {
+          updatedDate && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>updated <FormattedDate date={updatedDate} /></span>
+            </>
+          )
+        }
+      </div>
+      <h1 class="display text-[clamp(1.85rem,4.5vw,2.75rem)]">{title}</h1>
+      <p class="mt-3 text-[var(--color-muted)] text-balance">{description}</p>
+      {tags.length > 0 && <div class="mt-5"><TagList tags={tags} /></div>}
+    </header>
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    <footer class="mt-16 border-t border-[var(--color-line)] pt-8">
+      <a href="/blog" class="link-underline font-mono text-sm text-[var(--color-muted)]">
+        ← back to writing
+      </a>
+    </footer>
+  </article>
+</Base>

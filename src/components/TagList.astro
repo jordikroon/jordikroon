@@ -1,0 +1,26 @@
+---
+interface Props {
+  tags: string[];
+  active?: string;
+}
+
+const { tags, active } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <ul class="flex flex-wrap items-center gap-2" aria-label="Tags">
+      {tags.map((tag) => (
+        <li>
+          <a
+            href={`/blog/tags/${tag}`}
+            class="tag"
+            aria-current={active === tag ? 'page' : undefined}
+          >
+            #{tag}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}

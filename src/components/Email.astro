@@ -1,0 +1,52 @@
+---
+import { SITE } from '@/site.config';
+
+interface Props {
+  label?: string;
+  class?: string;
+  user?: string;
+  domain?: string;
+}
+
+const {
+  label,
+  class: className,
+  user = SITE.emailUser,
+  domain = SITE.emailDomain,
+} = Astro.props;
+---
+
+<a
+  href={`#contact`}
+  data-u={user}
+  data-d={domain}
+  data-email-link
+  class:list={['email-link', className]}
+  rel="nofollow noopener"
+>
+  <span data-email-display>
+    {label ?? <>{user} <span aria-hidden="true">[at]</span> {domain}</>}
+  </span>
+</a>
+
+<script>
+  const upgrade = () => {
+    document
+      .querySelectorAll<HTMLAnchorElement>('a[data-email-link]')
+      .forEach((a) => {
+        if (a.dataset.bound === '1') return;
+        const u = a.dataset.u;
+        const d = a.dataset.d;
+        if (!u || !d) return;
+        const email = `${u}@${d}`;
+        a.setAttribute('href', `mailto:${email}`);
+        const display = a.querySelector<HTMLElement>('[data-email-display]');
+        if (display && display.dataset.keep !== '1') {
+          display.textContent = email;
+        }
+        a.dataset.bound = '1';
+      });
+  };
+  upgrade();
+  document.addEventListener('astro:after-swap', upgrade);
+</script>

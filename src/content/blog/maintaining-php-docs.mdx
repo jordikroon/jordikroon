@@ -1,0 +1,66 @@
+---
+title: 'The PHP manual should be the source of truth'
+description: "On the work behind the PHP manual: PR review, issue triage, writing the PHP 8.5 entries that don't exist yet, and how to help."
+pubDate: 2026-05-13T12:00:00
+tags: ['php', 'open-source', 'documentation']
+---
+
+The PHP manual ships with every PHP installation, sits at the top of every search
+result for the language, and is how generations of developers learn the basics. My
+position on maintenance work is simple: **the documentation should be the source of
+truth.** Not blog posts. Not old Stack Overflow answers. The manual.
+
+That belief shapes the day-to-day.
+
+Most of the work is reviewing and merging pull requests, and triaging issues from
+contributors and readers. Typos, broken examples, outdated notes, markup hygiene. If
+a fix is right, it lands.
+
+The harder part is rewriting pages and writing new ones. PHP 8.5 has its share of
+undocumented entries right now. Features tend to ship faster than the prose around
+them, and closing those gaps is the difference between good-enough docs and a
+canonical reference.
+
+## How to help
+
+The bar isn't high. Most fixes are markup tweaks or example updates. Here is the
+shortest path from "this page is wrong" to a merged PR.
+
+### Set up locally
+
+The full guide lives at
+[doc.php.net/guide/local-setup](https://doc.php.net/guide/local-setup). With
+Docker installed, the short version is:
+
+```bash
+mkdir phpdoc && cd phpdoc
+git clone https://github.com/php/doc-en.git en
+cd en
+make
+open output/php-chunked-xhtml/index.html
+```
+
+That builds the manual locally. Edit a file under `en/reference/...`, run `make`
+again, refresh the page.
+
+### Find something to fix
+
+- A page that once confused you. That is a real bug.
+- Open [issues on `php/doc-en`](https://github.com/php/doc-en/issues).
+- The [PHP 8.5 changelog](https://www.php.net/ChangeLog-8.php), cross-referenced
+  against the manual. Anything new without a page is fair game.
+
+### Submit the PR
+
+Standard GitHub flow. The manual is DocBook XML, not Markdown:
+
+- Prefer `<simpara>` over `<para>` where possible. Use `<programlisting>`,
+  `<simplelist>` and friends as needed. Reference existing pages if you are unsure
+  of the right element.
+- `make` validates the XML as part of the build. If it errors, the XML is
+  malformed.
+- Smaller, focused PRs are easier to review and land sooner, but do not force a
+  fix into multiple PRs if it really belongs together.
+
+If you get stuck, say so in the PR description. Maintainers (myself included)
+would rather help than watch a useful fix sit unmerged.

@@ -1,0 +1,51 @@
+---
+import { NAV } from '@/site.config';
+import ThemeToggle from './ThemeToggle.astro';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<header class="border-b border-[var(--color-line)]">
+  <div class="container-wide flex h-14 items-center justify-between gap-6">
+    <a
+      href="/"
+      class="font-mono text-sm tracking-tight transition-colors hover:text-[var(--color-accent)]"
+      aria-label="Home"
+    >
+      <span class="text-[var(--color-subtle)]">~/</span>jordikroon<span
+        class="text-[var(--color-subtle)]"
+      >
+        $</span
+      >
+      <span class="caret" aria-hidden="true"></span>
+    </a>
+
+    <nav aria-label="Primary">
+      <ul class="flex items-center gap-4 font-mono text-sm">
+        {
+          NAV.filter((item) => item.href !== '/').map((item) => {
+            const itemPath = item.href.replace(/\/$/, '');
+            const active = path === itemPath || path.startsWith(`${itemPath}/`);
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  class:list={[
+                    'transition-colors hover:text-[var(--color-accent)]',
+                    active ? 'text-[var(--color-fg)]' : 'text-[var(--color-muted)]',
+                  ]}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
+        }
+        <li class="ml-1">
+          <ThemeToggle />
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

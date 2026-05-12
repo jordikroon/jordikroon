@@ -1,0 +1,16 @@
+---
+import Base from '@/layouts/Base.astro';
+---
+
+<Base title="404" description="Page not found.">
+  <section class="container-prose flex min-h-[60vh] flex-col items-start justify-center">
+    <p class="eyebrow">404</p>
+    <h1 class="display mt-4 text-[clamp(2rem,5vw,3.25rem)]">
+      This page does <em>not</em> exist.
+    </h1>
+    <p class="mt-4 text-[var(--color-muted)]">
+      The link is broken, the page was moved, or it was never here in the first place.
+    </p>
+    <a href="/" class="link-underline mt-8 font-mono text-sm">← back home</a>
+  </section>
+</Base>

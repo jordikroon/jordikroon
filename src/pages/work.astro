@@ -1,0 +1,65 @@
+---
+import Base from '@/layouts/Base.astro';
+import { SOCIAL } from '@/site.config';
+---
+
+<Base
+  title="Work"
+  description="What Jordi Kroon does day-to-day."
+>
+  <section class="container-prose pt-20">
+    <p class="eyebrow">Work</p>
+    <h1 class="display mt-4 text-[clamp(2rem,5vw,3.25rem)]">
+      Where my <em>time</em> goes.
+    </h1>
+  </section>
+
+  <section class="container-prose mt-16">
+    <header class="border-b border-[var(--color-line)] pb-3">
+      <h2 class="eyebrow not-italic">On Your Marks</h2>
+    </header>
+    <p class="mt-5">
+      I work at <a class="link-underline" href={SOCIAL.onyourmarks} rel="noopener">On Your Marks</a>,
+      a Dutch agency for digital products in sport. My side: DevOps and back-end. Kubernetes,
+      Terraform, GitLab CI/CD, Craft CMS, Symfony, Laravel.
+    </p>
+  </section>
+
+  <section class="container-prose mt-16">
+    <header class="border-b border-[var(--color-line)] pb-3">
+      <h2 class="eyebrow not-italic">PHP Foundation · documentation</h2>
+    </header>
+    <p class="mt-5">
+      Official maintainer of the
+      <a class="link-underline" href={SOCIAL.phpDocs} rel="noopener">English PHP documentation</a>.
+      I review PRs, modernise examples, fix markup, and write new pages when something is missing.
+      Supported by the PHP Foundation.
+    </p>
+  </section>
+
+  <section class="container-prose mt-16">
+    <header class="border-b border-[var(--color-line)] pb-3">
+      <h2 class="eyebrow not-italic">Kubernetes hosting</h2>
+    </header>
+    <p class="mt-5">
+      I host client sites and campaigns on
+      <a class="link-underline" href="https://www.ovhcloud.com/en/public-cloud/kubernetes/" rel="noopener">
+        OVHcloud Managed Kubernetes</a>,
+      deployed via
+      <a class="link-underline" href="https://argo-cd.readthedocs.io/" rel="noopener">ArgoCD</a>.
+      Terraform-managed baseline, GitLab CI/CD templates. Boring on purpose.
+    </p>
+  </section>
+
+  <section class="container-prose mt-16">
+    <header class="border-b border-[var(--color-line)] pb-3">
+      <h2 class="eyebrow not-italic">Open source</h2>
+    </header>
+    <p class="mt-5">
+      Everything I publish is open. See <a class="link-underline" href="/projects">projects</a> for
+      the curated list, or
+      <a class="link-underline" href={SOCIAL.github} rel="noopener">github.com/jordikroon</a>
+      for everything else.
+    </p>
+  </section>
+</Base>

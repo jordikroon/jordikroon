@@ -1,0 +1,29 @@
+---
+interface Props {
+  number: string;
+  title: string;
+  href?: string;
+  hrefLabel?: string;
+}
+
+const { number, title, href, hrefLabel } = Astro.props;
+---
+
+<header class="flex items-baseline justify-between border-b border-[var(--color-line)] pb-3">
+  <h2 class="flex items-baseline gap-3">
+    <span
+      class="font-mono text-xs tracking-widest text-[var(--color-subtle)] tabular-nums"
+      aria-hidden="true"
+    >
+      §{number}
+    </span>
+    <span class="eyebrow not-italic">{title}</span>
+  </h2>
+  {
+    href && (
+      <a class="link-underline font-mono text-xs text-[var(--color-muted)]" href={href}>
+        {hrefLabel ?? 'view all'} →
+      </a>
+    )
+  }
+</header>

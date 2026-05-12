@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import PostCard from '@/components/PostCard.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import { ELSEWHERE } from '@/data/elsewhere';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
+);
+
+const allTags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
+---
+
+<Base
+  title="Writing"
+  description="Notes, walk-throughs and opinions on DevOps, PHP, and the open web."
+>
+  <section class="container-wide pt-20">
+    <p class="eyebrow">Writing</p>
+    <h1 class="display mt-4 text-[clamp(2rem,5vw,3.5rem)]">
+      Notes, walk-throughs and <em>opinions</em>.
+    </h1>
+    <p class="mt-5 max-w-2xl text-[var(--color-muted)] text-balance">
+      Mostly about DevOps, PHP, caching, and the open web. Subscribe via
+      <a class="link-underline" href="/rss.xml">RSS</a>.
+    </p>
+
+    {
+      allTags.length > 0 && (
+        <div class="mt-8">
+          <p class="eyebrow mb-2">Tags</p>
+          <ul class="flex flex-wrap gap-2">
+            {allTags.map((tag) => (
+              <li>
+                <a href={`/blog/tags/${tag}`} class="tag">#{tag}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+  </section>
+
+  <section class="container-wide mt-16">
+    <SectionHeading number="01" title="Here" />
+    {posts.map((post) => <PostCard post={post} />)}
+  </section>
+
+  {
+    ELSEWHERE.length > 0 && (
+      <section class="container-wide mt-16">
+        <SectionHeading number="02" title="Elsewhere" />
+        {ELSEWHERE.map((item) => (
+          <article class="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 border-b border-[var(--color-line)] py-5 sm:gap-x-10">
+            <div class="pt-1 font-mono text-xs text-[var(--color-muted)] tabular-nums">
+              {item.year ?? <span class="annotation">[off-site]</span>}
+            </div>
+            <div>
+              <h3 class="text-lg font-medium leading-snug">
+                <a href={item.url} rel="noopener" class="link-underline">
+                  {item.title}
+                </a>
+              </h3>
+              <p class="mt-1 font-mono text-xs text-[var(--color-subtle)]">
+                published on {item.publication}
+              </p>
+              {item.description && (
+                <p class="mt-1 text-sm text-[var(--color-muted)] text-balance">
+                  {item.description}
+                </p>
+              )}
+            </div>
+          </article>
+        ))}
+      </section>
+    )
+  }
+</Base>
