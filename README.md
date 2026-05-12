@@ -20,7 +20,7 @@ lot about making technical docs that don't suck.
 
 - 🌐 [jordikroon.nl](https://jordikroon.nl)
 - 💼 [LinkedIn](https://www.linkedin.com/in/kroonjordi/)
-- 🏢 [On Your Marks](https://www.onyourmarks.agency/) — the agency I work with
+- 🏢 [On Your Marks](https://www.onyourmarks.agency/)
 - 🔐 PGP: [jordikroon.nl/pgp](https://jordikroon.nl/pgp)
 
 ---
