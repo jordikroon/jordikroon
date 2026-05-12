@@ -1,124 +1,37 @@
-# jordikroon
+## Hi, I'm Jordi 👋
 
-Personal site of [Jordi Kroon](https://github.com/jordikroon) — DevOps & backend
-engineer, official maintainer of the PHP documentation.
+DevOps & backend engineer from the Netherlands. Maintainer of the
+[PHP documentation](https://github.com/php/doc-en), occasional contributor to
+[php-src](https://github.com/php/php-src), and open-source advocate.
 
-Built with the most boring-modern open source stack I could justify: **Astro 5** for
-content-first SSG, **Tailwind CSS v4** for styling, **MDX** + type-safe content
-collections for the blog, **Shiki** for code, deployed to **GitHub Pages** via
-**GitHub Actions** on **Node 24** + **pnpm**.
+I run things in production on Kubernetes, write PHP for a living, and care a
+lot about making technical docs that don't suck.
 
-## Stack
+### What I'm doing now
 
-| Layer        | Choice                                         |
-| ------------ | ---------------------------------------------- |
-| Runtime      | Node.js 24                                     |
-| Package mgr  | pnpm 10                                        |
-| Framework    | [Astro](https://astro.build) 6                 |
-| Styling      | [Tailwind CSS](https://tailwindcss.com) v4     |
-| Authoring    | MDX + Astro Content Collections (Zod schemas) |
-| Code blocks  | [Shiki](https://shiki.style) (dual theme)      |
-| Search-engine | Sitemap + RSS                                 |
-| Fonts        | Inter Variable + JetBrains Mono Variable (OFL) |
-| Deploy       | GitHub Actions → GitHub Pages                  |
+- 📖 Maintaining [`php/doc-en`](https://github.com/php/doc-en) — reviewing PRs,
+  modernising examples, writing new manual pages.
+- 🛠️ Building [`docbook-cs`](https://github.com/jordikroon/docbook-cs) — lint
+  tooling that keeps DocBook contributions consistent at scale.
+- ☸️ Running PHP / Craft / Sveltekit workloads on Kubernetes with
+  ArgoCD + Terraform.
 
-Zero JS shipped on most pages. Just a tiny theme toggle.
+### Find me
 
-## Development
+- 🌐 [jordikroon.nl](https://jordikroon.nl)
+- 💼 [LinkedIn](https://www.linkedin.com/in/kroonjordi/)
+- 🏢 [On Your Marks](https://www.onyourmarks.agency/) — the agency I work with
+- 🔐 PGP: [jordikroon.nl/pgp](https://jordikroon.nl/pgp)
 
-```sh
-# install (Node 24 required; use nvm/fnm/volta)
-pnpm install
-
-# run dev server
-pnpm dev
-
-# type-check
-pnpm check
-
-# production build
-pnpm build
-
-# preview the build
-pnpm preview
-```
-
-## Authoring content
-
-### Blog posts
-
-Drop an `.mdx` (or `.md`) file in `src/content/blog/`:
-
-```mdx
----
-title: 'A new post'
-description: 'One-line summary used in lists, RSS and social previews.'
-pubDate: 2026-05-12
-updatedDate: 2026-05-20
-tags: ['php', 'caching']
-draft: false
 ---
 
-Write your post here. Standard markdown plus JSX.
-```
+<details>
+<summary>About this repo</summary>
 
-Schema lives at `src/content.config.ts` — `pnpm check` will catch frontmatter errors.
+This is the source for [jordikroon.nl](https://jordikroon.nl) — an Astro static
+site deployed to GitHub Pages. Build, content authoring and deployment notes
+live in [`DEVELOPMENT.md`](./DEVELOPMENT.md).
 
-### Projects
+**License:** MIT for code, CC BY 4.0 for content in `src/content/`.
 
-Add a `.md` file in `src/content/projects/`:
-
-```md
----
-name: 'project-name'
-description: 'One-line description shown in lists.'
-url: 'https://example.com'
-repo: 'https://github.com/jordikroon/project-name'
-role: 'Maintainer'
-tags: ['php', 'open-source']
-featured: true
-order: 1
----
-```
-
-`featured: true` projects show on the home page. `order` controls position
-(lower = higher).
-
-## Site configuration
-
-Top-level values (URL, title, nav, socials) live in `src/site.config.ts`. Update them
-there rather than scattering literals across templates.
-
-## PGP
-
-Replace `public/pgp.asc` with your actual ASCII-armored public key:
-
-```sh
-gpg --armor --export YOUR_KEY_ID > public/pgp.asc
-```
-
-Then update the `fingerprint` and `keyId` in `src/pages/pgp.astro`.
-
-## Deployment
-
-1. Push this repo to GitHub (`jordikroon/jordikroon` if you want the canonical user
-   site at `https://jordikroon.github.io`).
-2. In repository **Settings → Pages**, set **Source** to **GitHub Actions**.
-3. Push to `main` — `.github/workflows/deploy.yml` builds and deploys.
-
-### Custom domain
-
-1. Add a `CNAME` file in `public/` containing the domain (e.g. `jordikroon.nl`).
-2. Update `SITE.url` in `src/site.config.ts`.
-3. Configure DNS as per [GitHub's docs](https://docs.github.com/pages/configuring-a-custom-domain-for-your-github-pages-site).
-
-### Project page (sub-path) deployment
-
-If hosting as a project page (`username.github.io/jordikroon`), uncomment / set
-`base: '/jordikroon'` in `src/site.config.ts`. The workflow already wires
-`base_path` via `actions/configure-pages` when run from a project repo.
-
-## License
-
-Source code: MIT.
-Content (posts and copy in `src/content/`): CC BY 4.0.
+</details>
