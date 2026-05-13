@@ -30,6 +30,8 @@ export const BUILD = {
 export const SOCIAL = {
   github: 'https://github.com/jordikroon',
   linkedin: 'https://www.linkedin.com/in/kroonjordi/',
+  mastodon: 'https://phpc.social/@jordikroon',
+  mastodonHandle: '@jordikroon@phpc.social',
   onyourmarks: 'https://www.onyourmarks.agency/over/',
   phpDocs: 'https://github.com/php/doc-en',
   rss: '/rss.xml',

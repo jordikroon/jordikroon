@@ -20,6 +20,7 @@ lot about making technical docs that don't suck.
 
 - 🌐 [jordikroon.nl](https://jordikroon.nl)
 - 💼 [LinkedIn](https://www.linkedin.com/in/kroonjordi/)
+- 🐘 [Mastodon](https://phpc.social/@jordikroon) (`@jordikroon@phpc.social`)
 - 🏢 [On Your Marks](https://www.onyourmarks.agency/)
 - 🔐 PGP: [jordikroon.nl/pgp](https://jordikroon.nl/pgp)
 
